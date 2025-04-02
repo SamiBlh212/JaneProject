@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+
+    'gemini' => [
+        'token' => env('GEMINI_API_TOKEN'),
+    ],
+
+
 ];

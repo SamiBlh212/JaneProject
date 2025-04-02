@@ -1,0 +1,140 @@
+/* ----- Style global ----- */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #BD83F7, #FF82BE);
+  color: #fff;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* ----- Étape d’introduction ----- */
+.intro-step {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+  padding: 2rem;
+}
+
+.intro-step h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.intro-text {
+  font-size: 1rem;
+  line-height: 1.5;
+  max-width: 600px;
+  margin-bottom: 2rem;
+}
+
+.start-test {
+  background-color: #fff;
+  color: #681BEF;
+  font-weight: bold;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.start-test:hover {
+  background-color: #f3f3f3;
+}
+
+.start-test img {
+  height: 80%;
+}
+
+/* ----- Formulaire ----- */
+form {
+  margin: auto;
+  width: 70%;
+  max-width: max-content;
+  padding: 2rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* On masque le formulaire par défaut (on l’affiche en JS après intro) */
+form {
+  display: none;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* ----- Questions ----- */
+.question {
+  display: none; /* masqué par défaut */
+}
+
+.question.active {
+  display: block;
+  width: 80%;
+}
+
+.question label {
+  color: #fff;
+  display: block;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+.question textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  min-height: 100px;
+  max-height: 300px;
+  resize: vertical;
+  margin-bottom: 1rem;
+}
+
+/* ----- Boutons ----- */
+.test-btn-container {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.test-btn {
+  background-color: #681BEF;
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+}
+
+.test-btn:hover {
+  background-color: #a76fe0;
+}
