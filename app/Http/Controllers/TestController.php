@@ -6,13 +6,15 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use App\Jobs\SendTestResultEmail;
+
 
 class TestController extends Controller
 {
-    // Si tu utilises une route GET pour afficher le formulaire, ajoute cette méthode :
+    // Affiche le formulaire de test
     public function showTest()
     {
-        return view('test'); // Vérifie que le fichier resources/views/test.blade.php existe
+        return view('test');
     }
 
     public function submitTest(Request $request)
@@ -31,14 +33,19 @@ class TestController extends Controller
             'question10' => 'Feedback et Évolution Personnelle : « Comment accueillez-vous les retours constructifs sur votre travail ou vos actions ? Donnez un exemple où un feedback vous a conduit à une évolution personnelle ou professionnelle significative. »'
         ];
 
-        // Validation des 10 questions : chaque champ doit être renseigné
-        $rules = [];
+        // Ajout de la validation pour l'email
+        $rules = [
+            'email' => 'required|email'
+        ];
         foreach ($questions as $key => $question) {
             $rules[$key] = 'required|string';
         }
         $validatedData = $request->validate($rules);
 
-        // Construction du prompt d'entrée avec le contexte, l'objectif, les instructions et l'exemple attendu
+        // Récupération de l'email de l'utilisateur
+        $userEmail = $validatedData['email'];
+
+        // Construction du prompt d'entrée
         $inputPrompt = <<<EOT
 Contexte :
 Tu incarnes le conseiller en orientation professionnelle par excellence, doté d'une compréhension approfondie de la nature humaine et de la psychologie. En tant qu'expert du MBTI, tu analyses avec une précision inégalée les traits de personnalité, sans aucun préjugé ni stéréotype, en t'appuyant sur les recherches les plus récentes. Ta neutralité et ta rigueur analytique garantissent des conseils personnalisés et pertinents.
@@ -68,18 +75,18 @@ Exemple de réponse attendue :
 Voici le formulaire complet avec les questions et les réponses :
 EOT;
 
-        // Construction dynamique du formulaire complet avec les thématiques et les réponses de l'utilisateur
+        // Construction dynamique du formulaire complet
         $formulaireComplet = "";
         foreach ($questions as $key => $questionText) {
             $answer = $validatedData[$key] ?? '';
             $formulaireComplet .= $questionText . "\nRéponse : " . $answer . "\n\n";
         }
 
-        // Concaténation du prompt final en joignant l'inputPrompt et le formulaire complet
+        // Concaténation du prompt final
         $finalInput = $inputPrompt . "\n" . $formulaireComplet;
 
-        // Construction de la partie "output" attendue (outputSchema)
-        $outputSchema = 'output:{   "type": "object",   "properties": {     "metiers": {       "type": "array",       "items": {         "type": "string"       }     }   },   "required": [     "metiers"   ] }';
+        // Construction de la partie "output" attendue
+        $outputSchema = 'output:{ "type": "object", "properties": { "metiers": { "type": "array", "items": { "type": "string" } } }, "required": [ "metiers" ] }';
 
         // Construction du payload complet à envoyer à l'API Gemini 2
         $payload = [
@@ -87,12 +94,8 @@ EOT;
                 [
                     "role" => "user",
                     "parts" => [
-                        [
-                            "text" => $finalInput
-                        ],
-                        [
-                            "text" => $outputSchema
-                        ]
+                        ["text" => $finalInput],
+                        ["text" => $outputSchema]
                     ]
                 ]
             ],
@@ -107,9 +110,7 @@ EOT;
                     "properties" => [
                         "metiers" => [
                             "type" => "array",
-                            "items" => [
-                                "type" => "string"
-                            ],
+                            "items" => [ "type" => "string" ],
                             "maxItems" => 4
                         ]
                     ],
@@ -118,10 +119,10 @@ EOT;
             ]
         ];
 
-        // Affichage du payload complet dans les logs pour tester dans la console de Gemini 2
+        // Log du payload pour debug
         Log::info("Prompt envoyé à Gemini 2 : " . json_encode($payload, JSON_PRETTY_PRINT));
 
-        // Récupérer la clé API depuis le fichier de configuration services.php
+        // Récupérer la clé API depuis la configuration
         $apiKey = config('services.gemini.token');
         $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . $apiKey;
 
@@ -129,22 +130,15 @@ EOT;
         try {
             $client = new Client();
             $response = $client->post($url, [
-                'headers' => [
-                    'Content-Type' => 'application/json'
-                ],
+                'headers' => ['Content-Type' => 'application/json'],
                 'json' => $payload,
             ]);
 
             $bodyResponse = json_decode($response->getBody(), true);
-
-            // Log de la réponse pour le débogage
             Log::info("Réponse de Gemini 2 : " . json_encode($bodyResponse, JSON_PRETTY_PRINT));
 
-            // Extraction du texte de réponse depuis le premier candidat
             $rawResponse = $bodyResponse['candidates'][0]['content']['parts'][0]['text'] ?? null;
-
             if ($rawResponse) {
-                // Décodage du JSON renvoyé par l'API
                 $decoded = json_decode($rawResponse, true);
                 $metiers = $decoded['metiers'] ?? 'Aucune réponse formatée reçue.';
             } else {
@@ -155,7 +149,15 @@ EOT;
             Log::error($metiers);
         }
 
-        // Affichage du résultat dans la vue dédiée (resources/views/result.blade.php)
+        // Dispatch du job pour envoyer l'email avec le résultat
+        try {
+            dispatch(new SendTestResultEmail($userEmail, $metiers));
+            Log::info("TestController : evoie d'email dispatché pour : " . $userEmail);
+        } catch (Exception $e) {
+            Log::error("TestController : Erreur lors du dispatch du job email : " . $e->getMessage());
+        }
+
+        // Affichage du résultat dans la vue dédiée
         return view('result', ['result' => $metiers]);
     }
 }

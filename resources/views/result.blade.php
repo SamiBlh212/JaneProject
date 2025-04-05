@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Résultat du Test</title>
+  <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
   <link rel="stylesheet" href="{{ asset('css/result.css') }}">
 </head>
 <body>

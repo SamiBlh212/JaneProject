@@ -1,0 +1,81 @@
+:root {
+    --font-text: 'Roboto', sans-serif;
+    --font-heading: 'Montserrat', sans-serif;
+    --font-squada: 'Squada One', cursive;
+    --primary-color: #6F3EF4;
+    --primary-color-hover: color-mix(in srgb, var(--primary-color) 90%, black 10%);
+    --secondary-color: #681BEF;
+    --tertiary-color: #F8A128;
+    --tertiary-color-hover: color-mix(in srgb, var(--tertiary-color) 90%, black 10%);
+    --quaternary-color: #FF5EAE;
+}
+
+/* Reset de base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+/* Par défaut, on applique Roboto pour le corps du texte */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-text);
+    background: #fff;
+    color: var(--secondary-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+
+main {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Pour tous les titres et boutons, on utilise Montserrat */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+button {
+    font-family: var(--font-heading);
+}
+
+a {
+    text-decoration: none;
+}
+
+button {
+    border: none;
+}
+
+input {
+    border: none;
+    padding: 3px;
+    color: var(--secondary-color);
+    font-size: 17px;
+}
+
+input::placeholder {
+    color: #691bef5c;
+    background: #fff;
+}
+
+/* Classe optionnelle pour utiliser Squada One quand nécessaire */
+.squada {
+    font-family: var(--font-squada);
+}

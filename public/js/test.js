@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function(){
   const testForm = document.getElementById('testForm');
   const startTestBtn = document.querySelector('.start-test');
 
-  // Au clic sur "COMMENCER LE TEST", masquer l'intro et afficher le formulaire
+  // Lors du clic sur "COMMENCER LE TEST"
   if(startTestBtn) {
     startTestBtn.addEventListener('click', function(){
       if(intro) {
@@ -12,11 +12,31 @@ document.addEventListener("DOMContentLoaded", function(){
       }
       if(testForm) {
         testForm.style.display = 'flex';
-        // Activer la première question
-        const firstQuestion = document.getElementById('q1');
-        if(firstQuestion) {
-          firstQuestion.classList.add('active');
+        // Activer le premier step : l'insertion de l'email (id "q1")
+        const emailStep = document.getElementById('q1');
+        if(emailStep) {
+          emailStep.classList.add('active');
+          // Désactiver le bouton "Suivant" par défaut
+          const emailNextBtn = emailStep.querySelector('.next-btn');
+          if(emailNextBtn) {
+            emailNextBtn.disabled = true;
+          }
         }
+      }
+    });
+  }
+
+  // Vérification du champ email dans l'étape email
+  const emailInput = document.getElementById("user-email");
+  if(emailInput) {
+    emailInput.addEventListener('input', function(){
+      // Récupérer le bouton "Suivant" de cette étape
+      const emailStep = this.closest('.question');
+      const emailNextBtn = emailStep.querySelector('.next-btn');
+      if(emailInput.validity.valid) {
+        emailNextBtn.disabled = false;
+      } else {
+        emailNextBtn.disabled = true;
       }
     });
   }
