@@ -956,6 +956,7 @@
 .section2 .section2TextBehind {
   position: absolute;
   z-index: -111;
+  width: 110%;
 }
 
 .section2 h2 {
